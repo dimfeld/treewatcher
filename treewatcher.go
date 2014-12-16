@@ -47,14 +47,20 @@ func (tw *TreeWatcher) Close() {
 	tw.quit <- 1
 }
 
-func (tw *TreeWatcher) WatchTree(path string) {
-	tw.watcher.Watch(path)
+func (tw *TreeWatcher) WatchTree(path string) error {
+	err := tw.watcher.Watch(path)
+	if err != nil {
+		return err
+	}
+
 	filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
 		if info != nil && info.IsDir() {
 			tw.watcher.Watch(file)
 		}
 		return nil
 	})
+
+	return nil
 }
 
 func (tw *TreeWatcher) Watch(path string) error {
